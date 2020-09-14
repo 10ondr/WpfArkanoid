@@ -11,7 +11,7 @@ This projects shows implementation of a simple 2D Arkanoid game in **WPF** with 
 - **bin/Release** folder - Compiled executable, ready to run.
 
 ## Game mechanics
-Player uses a **paddle** (green horizontal rectangle) to control **ball** movement and try to hit and destroy all available **bricks** in each level. Upon destruction of all bricks in a level a new level is loaded.
+Player uses a **paddle** (green horizontal rectangle) to control **ball** movement and try to hit and destroy all available **bricks** in each level. Ball bounce angle is affected by the paddle movement at the time of collision so player can aim at the bricks better. Upon destruction of all bricks in a level a new level is loaded.
 
 The speed of all balls is gradually increasing over time so it motivates the player to finish the level as fast as possible.
 
