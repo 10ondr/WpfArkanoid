@@ -8,6 +8,7 @@ This projects shows implementation of a simple 2D Arkanoid game in **WPF** with 
 - **ViewModels** folder - Contains View Models, commands and value converters.
 - **Models** folder - Contains classes describing game state and logic.
 - **Resources/Levels** folder - Contains XML representation of the individual game levels for easy editing.
+- **bin/Release** folder - Compiled executable, ready to run.
 
 ## Game mechanics
 Player uses a **paddle** (green horizontal rectangle) to control **ball** movement and try to hit and destroy all available **bricks** in each level. Upon destruction of all bricks in a level a new level is loaded.
