@@ -1,0 +1,230 @@
+﻿<local:BaseWindow x:Class="WpfArkanoid.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfArkanoid.Views"
+        mc:Ignorable="d"
+        xmlns:VM="clr-namespace:WpfArkanoid.ViewModels"
+        Title="Arkanoid!"
+        Height="{Binding DisplayAreaHeight, Mode=TwoWay}"
+        Width="{Binding DisplayAreaWidth, Mode=TwoWay}"
+        ResizeMode="CanMinimize"
+        KeyDown="BaseWindow_KeyDown"
+        KeyUp="BaseWindow_KeyUp"
+        KeyDownCommand="{Binding KeyDownCommand}"
+        KeyUpCommand="{Binding KeyUpCommand}"
+        >
+
+    <Window.Resources>
+        <!-- Converters -->
+        <VM:CollectableToStringConverter x:Key="CollectableToStringConverter" />
+        <VM:GameOverToVisibilityConverter x:Key="GameOverToVisibilityConverter" />
+        <VM:GameWonToVisibilityConverter x:Key="GameWonToVisibilityConverter" />
+        <VM:BrickHealthToColorConverter x:Key="BrickHealthToColorConverter" />
+        <VM:BallDamageToColorConverter x:Key="BallDamageToColorConverter" />
+
+        <!-- Data template to bind individual Bricks in a BrickRow -->
+        <DataTemplate x:Key="Inner_Bricks">
+            <Rectangle Width="{Binding Width}" Height="{Binding Height}" Stroke="Black" StrokeThickness="1">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding Health, Converter={StaticResource BrickHealthToColorConverter}}"/>
+                </Rectangle.Fill>
+                <Rectangle.RenderTransform>
+                    <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+        </DataTemplate>
+
+        <!-- Data template to bind individual BrickRows in a Level -->
+        <DataTemplate x:Key="Inner_BrickRows">
+            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource Inner_Bricks}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DataTemplate>
+    </Window.Resources>
+
+    
+    
+    <Grid DataContext="{Binding Game}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Lives counter -->
+        <TextBlock  Margin="5, 0, 0, 0"
+                    Grid.Row="2" Grid.Column="0" FontSize="20"
+                    Text="Lives:"/>
+        <TextBlock  Margin="5, 0, 0, 0"
+                    Grid.Row="2" Grid.Column="1" FontSize="20"
+                    Text="{Binding CurrentPlayerStats.Lives}"/>
+        
+        <!-- Score counter -->
+        <TextBlock  Margin="5, 0, 0, 0"
+                    Grid.Row="3" Grid.Column="0" FontSize="20"
+                    Text="Score:"/>
+        <TextBlock  Margin="5, 0, 0, 0"
+                    Grid.Row="3" Grid.Column="1" FontSize="20"
+                    Text="{Binding CurrentPlayerStats.Score}"/>
+        
+        <!-- Last collectable description -->
+        <TextBlock  Grid.Row="2" Grid.Column="3" FontSize="20"
+                    HorizontalAlignment="Center"
+                    Text="{Binding CurrentPlayerStats.LastCollectable, Converter={StaticResource CollectableToStringConverter}}"/>
+
+        
+        <Canvas x:Name="GameCanvas"
+                Background="#FFE3EACB"
+                Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                Width="{Binding GameAreaWidth}"
+                Height="{Binding GameAreaHeight}">
+
+            <!-- Collectables -->
+            <ItemsControl ItemsSource="{Binding Collectables}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse
+                            Height="{Binding Height}"
+                            Width="{Binding Width}"
+                            Fill="#FFFF00F3"
+                            StrokeThickness="1"
+                            Stroke="#FFFF8000">
+
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Player balls -->
+            <ItemsControl ItemsSource="{Binding Balls}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse
+                            Height="{Binding Height}"
+                            Width="{Binding Width}"
+                            StrokeThickness="1"
+                            Stroke="#FF0000FF">
+                            <Ellipse.Fill>
+                                <SolidColorBrush Color="{Binding Damage, Converter={StaticResource BallDamageToColorConverter}}"/>
+                            </Ellipse.Fill>
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Player paddle -->
+            <Rectangle DataContext="{Binding PlayerPaddle}"
+                Height="{Binding Height}"
+                Width="{Binding Width}"
+                Fill="#FF00FF2E"
+                StrokeThickness="1"
+                Stroke="Black">
+
+                <Rectangle.RenderTransform>
+                    <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+
+            <!-- Walls -->
+            <ItemsControl ItemsSource="{Binding CurrentLevel.Walls}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Black">
+                            <Rectangle.RenderTransform>
+                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                            </Rectangle.RenderTransform>
+                        </Rectangle>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Death triggers -->
+            <ItemsControl ItemsSource="{Binding CurrentLevel.DeathTriggers}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Red" Opacity="0.4">
+                            <Rectangle.RenderTransform>
+                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+                            </Rectangle.RenderTransform>
+                        </Rectangle>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Bricks -->
+            <ItemsControl ItemsSource="{Binding CurrentLevel.BrickRows}"  ItemTemplate="{StaticResource Inner_BrickRows}"/>
+        </Canvas>
+
+
+        <!-- GAME OVER Overlay -->
+        <Canvas Visibility="{Binding CurrentPlayerStats.GameState, Converter={StaticResource GameOverToVisibilityConverter}}"
+                Background="#FFFF4E4E"
+                Opacity="0.75"
+                Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                Width="{Binding GameAreaWidth}"
+                Height="{Binding GameAreaHeight}">
+        </Canvas>
+        <StackPanel Visibility="{Binding CurrentPlayerStats.GameState, Converter={StaticResource GameOverToVisibilityConverter}}"
+            Grid.ColumnSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" FontSize="50" Text="GAME OVER"/>
+            <TextBlock HorizontalAlignment="Center" FontSize="25" Text="Press ENTER to start a new game"/>
+        </StackPanel>
+
+        <!-- GAME WON Overlay-->
+        <Canvas Visibility="{Binding CurrentPlayerStats.GameState, Converter={StaticResource GameWonToVisibilityConverter}}"
+                Background="#FF4EFF66"
+                Opacity="0.75"
+                Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                Width="{Binding GameAreaWidth}"
+                Height="{Binding GameAreaHeight}">
+        </Canvas>
+        <StackPanel Visibility="{Binding CurrentPlayerStats.GameState, Converter={StaticResource GameWonToVisibilityConverter}}"
+            Grid.ColumnSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" FontSize="50" Text="CONGRATULATIONS!"/>
+            <TextBlock HorizontalAlignment="Center" FontSize="35" Text="You finished all levels"/>
+            <TextBlock HorizontalAlignment="Center" FontSize="25" Text="Press ENTER to start all over again"/>
+        </StackPanel>
+    </Grid>
+
+</local:BaseWindow>
