@@ -1,6 +1,6 @@
 # WPF Arkanoid!
 
-This projects shows implementation of a simple 2D Arkanoid game in **WPF** with usage of the **MVVM pattern**. This project was created using Microsoft Visual Studio Community 2019 (Version 16.7.2) with only default .NET libraries and packages.
+This project shows implementation of a simple 2D Arkanoid game in **WPF** with usage of the **MVVM pattern**. This project was created using Microsoft Visual Studio Community 2019 (Version 16.7.2) with only default .NET libraries and packages.
 
 # Files
 
