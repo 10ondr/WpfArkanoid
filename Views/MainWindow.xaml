@@ -24,21 +24,26 @@
         <VM:BrickHealthToColorConverter x:Key="BrickHealthToColorConverter" />
         <VM:BallDamageToColorConverter x:Key="BallDamageToColorConverter" />
 
-        <!-- Data template to bind individual Bricks in a BrickRow -->
+		<!-- Style to position elements inside a canvas -->
+		<Style x:Key="CanvasPositioningStyle" TargetType="ContentPresenter">
+			<Setter Property="Canvas.Left" Value="{Binding X}"/>
+			<Setter Property="Canvas.Top" Value="{Binding Y}"/>
+		</Style>
+
+		<!-- Data template to bind individual Bricks in a BrickRow -->
         <DataTemplate x:Key="Inner_Bricks">
             <Rectangle Width="{Binding Width}" Height="{Binding Height}" Stroke="Black" StrokeThickness="1">
-                <Rectangle.Fill>
-                    <SolidColorBrush Color="{Binding Health, Converter={StaticResource BrickHealthToColorConverter}}"/>
-                </Rectangle.Fill>
-                <Rectangle.RenderTransform>
-                    <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                </Rectangle.RenderTransform>
-            </Rectangle>
+				<Rectangle.Fill>
+					<SolidColorBrush Color="{Binding Health, Converter={StaticResource BrickHealthToColorConverter}}"/>
+				</Rectangle.Fill>
+			</Rectangle>
         </DataTemplate>
 
         <!-- Data template to bind individual BrickRows in a Level -->
         <DataTemplate x:Key="Inner_BrickRows">
-            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource Inner_Bricks}">
+            <ItemsControl ItemsSource="{Binding}"
+						  ItemTemplate="{StaticResource Inner_Bricks}"
+						  ItemContainerStyle="{Binding Source={StaticResource CanvasPositioningStyle}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas/>
@@ -93,31 +98,29 @@
                 Height="{Binding GameAreaHeight}">
 
             <!-- Collectables -->
-            <ItemsControl ItemsSource="{Binding Collectables}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
+			<ItemsControl ItemsSource="{Binding Collectables}"
+						  ItemContainerStyle="{Binding Source={StaticResource CanvasPositioningStyle}}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse
+						<Ellipse
                             Height="{Binding Height}"
                             Width="{Binding Width}"
                             Fill="#FFFF00F3"
                             StrokeThickness="1"
                             Stroke="#FFFF8000">
-
-                            <Ellipse.RenderTransform>
-                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                            </Ellipse.RenderTransform>
-                        </Ellipse>
+						</Ellipse>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
             <!-- Player balls -->
-            <ItemsControl ItemsSource="{Binding Balls}">
+            <ItemsControl ItemsSource="{Binding Balls}"
+						  ItemContainerStyle="{Binding Source={StaticResource CanvasPositioningStyle}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas/>
@@ -130,32 +133,28 @@
                             Width="{Binding Width}"
                             StrokeThickness="1"
                             Stroke="#FF0000FF">
-                            <Ellipse.Fill>
-                                <SolidColorBrush Color="{Binding Damage, Converter={StaticResource BallDamageToColorConverter}}"/>
-                            </Ellipse.Fill>
-                            <Ellipse.RenderTransform>
-                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                            </Ellipse.RenderTransform>
-                        </Ellipse>
+							<Ellipse.Fill>
+								<SolidColorBrush Color="{Binding Damage, Converter={StaticResource BallDamageToColorConverter}}"/>
+							</Ellipse.Fill>
+						</Ellipse>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
             <!-- Player paddle -->
-            <Rectangle DataContext="{Binding PlayerPaddle}"
+			<Rectangle DataContext="{Binding PlayerPaddle}"
                 Height="{Binding Height}"
                 Width="{Binding Width}"
                 Fill="#FF00FF2E"
                 StrokeThickness="1"
-                Stroke="Black">
-
-                <Rectangle.RenderTransform>
-                    <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                </Rectangle.RenderTransform>
-            </Rectangle>
+                Stroke="Black"
+			    Canvas.Left="{Binding X}"
+			    Canvas.Top="{Binding Y}">
+			</Rectangle>
 
             <!-- Walls -->
-            <ItemsControl ItemsSource="{Binding CurrentLevel.Walls}">
+            <ItemsControl ItemsSource="{Binding CurrentLevel.Walls}"
+						  ItemContainerStyle="{Binding Source={StaticResource CanvasPositioningStyle}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas/>
@@ -163,17 +162,15 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Black">
-                            <Rectangle.RenderTransform>
-                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                            </Rectangle.RenderTransform>
-                        </Rectangle>
+						<Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Black">
+						</Rectangle>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
             <!-- Death triggers -->
-            <ItemsControl ItemsSource="{Binding CurrentLevel.DeathTriggers}">
+            <ItemsControl ItemsSource="{Binding CurrentLevel.DeathTriggers}"
+						  ItemContainerStyle="{Binding Source={StaticResource CanvasPositioningStyle}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas/>
@@ -181,11 +178,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Red" Opacity="0.4">
-                            <Rectangle.RenderTransform>
-                                <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
-                            </Rectangle.RenderTransform>
-                        </Rectangle>
+						<Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Red" Opacity="0.4">
+						</Rectangle>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
